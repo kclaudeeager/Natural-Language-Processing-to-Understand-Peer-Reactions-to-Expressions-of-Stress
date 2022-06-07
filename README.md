@@ -2,7 +2,7 @@
 To understand how to positively reframe or react to expressions of negative feelings on social media. 
 
 
-##Problem Statement:
+## Problem Statement:
 Social media platforms are now the place where many people are expressing their feelings and their views on a given topic. Often, these feelings are negative and reflect the impact of stressful situations or contexts. We are working on a task called positive reframing in which we seek to identify (1) positive ways to reframe a negative point of view; and (2) peer reactions to negative feelings that receive endorsement (and thus are likely to have a positive impact).
 
 ## Project Mission:
