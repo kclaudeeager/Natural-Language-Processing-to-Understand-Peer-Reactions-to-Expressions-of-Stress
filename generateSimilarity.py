@@ -64,12 +64,12 @@ def get_key(val,my_dict):
          #print(key,": "+value)
          print(val)
          if val.lower() in value.lower():
-             print("OKKKKKKK"+val)
-             print(key)
+            #  print("OKKKKKKK"+val)
+            #  print(key)
              return key
-         else:
-             print(val.__eq__(value))
-             print("Not equal in any way")
+        #  else:
+        #      print(val.__eq__(value))
+        #      print("Not equal in any way")
  
     return "key doesn't exist"
 def getTweetDict(tweetList):
@@ -81,7 +81,7 @@ def getTweetDict(tweetList):
 def get_recommendations(title, cosine_sim, tweetList,limit):
     # Get the index of the tweet that matches the title
     twitDict=getTweetDict(tweetList)
-    print(twitDict)
+    #print(twitDict)
     # print(title)
     # print(tweetList[0])
     # print(twitDict.get(0))
