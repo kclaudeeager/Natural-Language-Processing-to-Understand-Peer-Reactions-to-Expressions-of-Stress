@@ -26,6 +26,10 @@ app.include_router(tweet.router, tags=['Tweets'], prefix='/api/tweets')
 app.include_router(reply.router,tags=['Replies'], prefix='/api/replies')
 app.include_router(ml_api.router,tags=['Reframing'], prefix='/api')
 
+@app.get("/")
+def runRoot():
+    return {"message":"this is positive reframing api"}
+
 
 @app.get("/api/positive-reframing")
 def root():

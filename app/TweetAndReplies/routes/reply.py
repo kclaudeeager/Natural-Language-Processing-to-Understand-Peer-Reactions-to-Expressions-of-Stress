@@ -60,7 +60,7 @@ async def get_replies(user: str = Depends(get_current_user)):
             if r['tweet_id']==str(rep['_id']):
                 rep['replies'].append(r)
 
-    for rep in replies:
+    for rep in replies:                      
         rep['_id']=str( rep['_id'])
         rep['user']=str(rep['user'])
         rep['created_at']=str(rep['created_at'])

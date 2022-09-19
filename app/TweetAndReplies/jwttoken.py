@@ -3,8 +3,7 @@ import email
 from jose import JWTError, jwt
 import TweetAndReplies.main
 import json
-
-
+import TweetAndReplies.main as main
 SECRET_KEY = "b0635b0b4d0ffd56c85059e9b6051b75c9db1c3e9511f29b7466178ca1e8eb92"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -35,5 +34,3 @@ def verify_token(token:str,credentials_exception):
      return token_data
 
 
-    
-    
