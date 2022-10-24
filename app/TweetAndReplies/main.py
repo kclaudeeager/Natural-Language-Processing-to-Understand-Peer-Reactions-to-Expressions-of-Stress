@@ -32,6 +32,7 @@ class UserModel(BaseModel):
     email:str
     username: str
     password: str
+    Photo:str
     
 class Login(BaseModel):
 	username: str

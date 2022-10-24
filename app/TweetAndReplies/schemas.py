@@ -1,6 +1,8 @@
 from ctypes import py_object
 from datetime import datetime
+from numbers import Number
 from typing import List, Union
+from unicodedata import numeric
 from pydantic import BaseModel, EmailStr, constr,Field
 from bson import ObjectId
 class PyObjectId(ObjectId):
@@ -55,11 +57,20 @@ class UserResponse(BaseModel):
 class FilteredUserResponse(UserBaseSchema):
     id: str
 
-
+class attachement(BaseModel):
+    caption:str
+    name:str
+    src:str
 class TweetBaseSchema(BaseModel):
-    hashtag: str
-    content: str
-    attachement: str
+    mentions:list
+    message:str
+    attachements:List[attachement]
+    hashtags:list
+    timeLeft:str
+    isreacted:bool=False
+    count:int=0
+    displayReplies:bool=False
+    retweets:int=0,
     created_at: datetime = None
     updated_at: datetime = None
     replies:List=[]
