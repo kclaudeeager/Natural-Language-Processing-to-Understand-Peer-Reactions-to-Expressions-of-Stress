@@ -31,11 +31,12 @@ def create_user(request:main.UserModel):
 @router.post('/login')
 def login(request:main.OAuth2PasswordRequestForm = Depends()):
 	user = main.User.find_one({"username":request.username})
+
 	if not user:
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail = f'No user found with this {request.username} username')
 	if not Hash.verify(user["password"],request.password):
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail = f'Wrong Username or password')
     
-	access_token = create_access_token(data={"sub": str({"username":user["username"],"id":str(user["_id"]),"email":user["email"],"password":user["password"]})})
+	access_token = create_access_token(data={"sub": str({"username":user["username"],"id":str(user["_id"]),"email":user["email"],"password":user["password"],"profile_image":user["profile_image"]})})
     
 	return {"access_token": access_token, "token_type": "bearer"}

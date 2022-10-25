@@ -1,6 +1,7 @@
 from ctypes import py_object
 from datetime import datetime
 from numbers import Number
+from pyexpat import model
 from typing import List, Union
 from unicodedata import numeric
 from pydantic import BaseModel, EmailStr, constr,Field
@@ -23,7 +24,7 @@ class PyObjectId(ObjectId):
 class UserBaseSchema(BaseModel):
     name: str
     email: str
-    photo: str
+    profile_image: str
     role: str = None
     created_at: datetime = None
     updated_at: datetime = None
@@ -64,16 +65,17 @@ class attachement(BaseModel):
 class TweetBaseSchema(BaseModel):
     mentions:list
     message:str
-    attachements:List[attachement]
     hashtags:list
+    attachements:List
     timeLeft:str
     isreacted:bool=False
     count:int=0
     displayReplies:bool=False
-    retweets:int=0,
+    retweets:int=0
     created_at: datetime = None
     updated_at: datetime = None
     replies:List=[]
+    
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
@@ -94,10 +96,15 @@ class TweetResponse(TweetBaseSchema):
 
 
 class UpdateTweetSchema(BaseModel):
-    title: str = None
-    content: str = None
-    category: str = None
-    attachement: str = None
+    mentions:list=None
+    message:str=None
+    hashtags:list=None
+    timeLeft:str=None
+    isreacted:bool=False
+    count:int=0
+    displayReplies:bool=False
+    retweets:int=0
+    attachements:List
     user: str = None
     replies:Union[List,None]=None
     class Config:
@@ -113,11 +120,17 @@ class ListPostResponse(BaseModel):
     posts: List[TweetResponse]
 class RepliesBaseSchema(BaseModel):
     tweet_id:str
-    tweet_reply:str
-    attachement:str
-    replies:List=[]
-    created_at: datetime= None
-    updated_at: datetime = None
+    mentions:list=None
+    message:str=None
+    hashtags:list=None
+    timeLeft:str=None
+    isreacted:bool=False
+    count:int=0
+    displayReplies:bool=False
+    retweets:int=0
+    attachements:List
+    user: str = None
+    replies:Union[List,None]=None
     class Config:
         orm_mode = True
         allow_population_by_field_name = True

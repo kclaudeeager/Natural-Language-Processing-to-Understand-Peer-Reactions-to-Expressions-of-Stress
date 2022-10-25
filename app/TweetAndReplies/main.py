@@ -32,7 +32,7 @@ class UserModel(BaseModel):
     email:str
     username: str
     password: str
-    Photo:str
+    profile_image:str
     
 class Login(BaseModel):
 	username: str
@@ -42,12 +42,14 @@ class Token(BaseModel):
     token_type: str
 class TokenData(UserModel):
     id:Optional[str]=None
+
 def userEntity(user) -> dict:
     return {
         "id": str(user["_id"]),
         "name": user["username"],
         "email": user["email"],
         "password": user["password"],
+        "profile_image": user["profile_image"],
         "created_at": user["created_at"],
         "updated_at": user["updated_at"]
     }
@@ -58,6 +60,7 @@ def userResponseEntity(user) -> dict:
         "id": str(user["_id"]),
         "name": user["username"],
         "email": user["email"],
+        "profile_image": user["profile_image"],
         "created_at": user["created_at"],
         "updated_at": user["updated_at"]
     }
@@ -68,6 +71,7 @@ def embeddedUserResponse(user) -> dict:
         "id": str(user["_id"]),
         "name": user["username"],
         "email": user["email"],
+         "profile_image": user["profile_image"]
     }
 
 
@@ -77,10 +81,16 @@ def userListEntity(users) -> list:
 def tweetEntity(tweet) -> dict:
     return {
         "id": str(tweet["_id"]),
-        "title": tweet["title"],
         "category": tweet["category"],
-        "content": tweet["content"],
-        "image": tweet["image"],
+        "message": tweet["message"],
+        "attachements": tweet["attachements"],
+        "hashtags":tweet["hashtags"],
+        "timeLeft":tweet["timeLeft"],
+        "isreacted":tweet["isreacted"],
+        "count":tweet["count"],
+        "mentions":tweet["mentions"],
+        "displayReplies":tweet["displayReplies"],
+        "retweets":tweet["retweets"],
         "user": str(tweet["user"]),
         "created_at": tweet["created_at"],
         "updated_at": tweet["updated_at"]
@@ -89,14 +99,21 @@ def tweetEntity(tweet) -> dict:
 
 def populatedTweetEntity(tweet) -> dict:
     return {
-        "id": str(tweet["_id"]),
         "title": tweet["title"],
         "category": tweet["category"],
-        "content": tweet["content"],
-        "image": tweet["image"],
-        "user": embeddedUserResponse(tweet["user"]),
+        "message": tweet["message"],
+        "attachements": tweet["attachements"],
+        "hashtags":tweet["hashtags"],
+        "timeLeft":tweet["timeLeft"],
+        "isreacted":tweet["isreacted"],
+        "count":tweet["count"],
+        "mentions":tweet["mentions"],
+        "displayReplies":tweet["displayReplies"],
+        "retweets":tweet["retweets"],
         "created_at": tweet["created_at"],
-        "updated_at": tweet["updated_at"]
+        "updated_at": tweet["updated_at"],
+        "user": embeddedUserResponse(tweet["user"]),
+        
     }
 class UserNotFound(Exception):
     pass

@@ -27,8 +27,8 @@ def verify_token(token:str,credentials_exception):
         print(type(data))
         if data is None:
             raise credentials_exception
-        token_data = main.TokenData(email=data['email'],username=data['username'],password=data['password'],id=data['id'])
-        print(token_data.username)
+        token_data = main.TokenData(email=data['email'],username=data['username'],password=data['password'],id=data['id'],profile_image=data['profile_image'])
+        print(token_data)
      except JWTError:
         raise credentials_exception
      return token_data

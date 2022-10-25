@@ -13,6 +13,7 @@ import TweetAndReplies.main as main
 router = APIRouter()
 @router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_tweet(tweet: schemas.TweetBaseSchema, userReturned: str = Depends(get_current_user)):
+    
     tweet=tweet.__dict__
     tweet.setdefault("user","")
     print(userReturned)
@@ -23,6 +24,10 @@ async def create_tweet(tweet: schemas.TweetBaseSchema, userReturned: str = Depen
     tweet['user']= ObjectId(user_id)
     tweet['created_at'] = datetime.utcnow()
     tweet['updated_at'] = tweet['created_at']
+    
+    #print(tweet)
+    print("Attachements>>",tweet['attachements'])
+    
     try:
         result =main.Tweet.insert_one(tweet)
         print("final results: ",result.inserted_id)
@@ -43,7 +48,7 @@ async def create_tweet(tweet: schemas.TweetBaseSchema, userReturned: str = Depen
 
 @router.get('/')
 def get_tweets(user: str = Depends(get_current_user)):
-  
+   
     tweets = list(main.Tweet.find())
     replies= list(main.Replies.find())
     for rep in replies:
