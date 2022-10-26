@@ -63,6 +63,7 @@ class attachement(BaseModel):
     name:str
     src:str
 class TweetBaseSchema(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     mentions:list
     message:str
     hashtags:list
@@ -96,6 +97,7 @@ class TweetResponse(TweetBaseSchema):
 
 
 class UpdateTweetSchema(BaseModel):
+   
     mentions:list=None
     message:str=None
     hashtags:list=None

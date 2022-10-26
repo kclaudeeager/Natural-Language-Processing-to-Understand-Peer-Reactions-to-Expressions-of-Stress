@@ -8,6 +8,7 @@ from TweetAndReplies.oauth import get_current_user
 from datetime import datetime, timedelta
 import TweetAndReplies.schemas as schemas
 import json
+from sys import getsizeof
 from bson import ObjectId
 import TweetAndReplies.main as main
 router = APIRouter()
@@ -84,31 +85,42 @@ def get_tweets(user: str = Depends(get_current_user)):
             if rep['tweet_id']==tweet['_id']:
                 tweet['replies'].append(rep)
         tweet=json.dumps(tweet)
-
-
-        # if tweet['replies']==[]:
-        #     pass
-        # else:
-        #     for repl in tweet['replies']:
-        #         repl['_id']=str( repl['_id'])
-        #         repl['user']=str(repl['user'])
-        #         repl['created_at']=str(repl['created_at'])
-        #         repl['updated_at']=str(repl['updated_at'])
-        #         if repl['replies']==[]:
-        #             pass
-        #         else:
-        #             for rep in repl['replies']:
-        #                 rep['_id']=str( rep['_id'])
-        #                 rep['user']=str(rep['user'])
-        #                 rep['created_at']=str(rep['created_at'])
-        #                 rep['updated_at']=str(rep['updated_at'])
-   
-    
-    
-
-
-
              
     return {'status': 'success', 'tweets': tweets}
 
+@router.get(
+    "/{id}", response_description="Get a single tweet", response_model=schemas.TweetBaseSchema
+)
+async def get_tweet(id: str,user: str = Depends(get_current_user)):
+    if(len(id)!=24):
+        raise HTTPException(status_code=404, detail=f" tweet id must have 12 length")
+    
+    try:
+        id=ObjectId(id)
+        if (tweet :=  main.Tweet.find_one({"_id":  id})) is not None:
+            return tweet
+
+        raise HTTPException(status_code=404, detail=f"tweet {id} not found")
+
+    except:
+      raise HTTPException(status_code=404, detail=f"tweet {id} not found")
+
+    
+@router.put("/{id}", response_description="Update a tweet", response_model=schemas.TweetBaseSchema)
+async def update_student(id: str, tweet: schemas.UpdateTweetSchema = Body(...),user: str = Depends(get_current_user)):
+    tweet = {k: v for k, v in tweet.dict().items() if v is not None}
+
+    if len(tweet) >= 1:
+        update_result = await main.Tweet.update_one({"_id": ObjectId(id)}, {"$set": tweet})
+
+        if update_result.modified_count == 1:
+            if (
+                updated_tweet := main.Tweet.find_one({"_id": id})
+            ) is not None:
+                return updated_tweet
+
+    if (existing_tweet := main.Tweet.find_one({"_id": id})) is not None:
+        return existing_tweet
+
+    raise HTTPException(status_code=404, detail=f"tweet {id} not found")
 
