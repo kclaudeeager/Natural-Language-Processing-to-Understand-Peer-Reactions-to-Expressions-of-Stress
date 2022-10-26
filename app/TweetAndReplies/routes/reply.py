@@ -45,22 +45,13 @@ async def create_reply(reply: schemas.RepliesBaseSchema, userReturned: str = Dep
     except:
       return {"Error":"Error in replying"}
 
-@router.get('/',response_description="List of all replies")
-async def get_replies(user: str = Depends(get_current_user)):
-    replies= list(main.Replies.find())
-    
-    print("found replies: ")
+def handleRecursion(replies:list):
     for rep in replies:
         for r in replies:
-            r['_id']=str( r['_id'])
-            r['user']=str(r['user'])
-            r['created_at']=str(r['created_at'])
-            r['updated_at']=str(r['updated_at'])
-            r.setdefault('replies',[])
             if r['tweet_id']==str(rep['_id']):
                 rep['replies'].append(r)
 
-    for rep in replies:                      
+    for rep in replies:
         rep['_id']=str( rep['_id'])
         rep['user']=str(rep['user'])
         rep['created_at']=str(rep['created_at'])
@@ -70,11 +61,70 @@ async def get_replies(user: str = Depends(get_current_user)):
             pass
         else:
             for repl in rep['replies']:
-                repl['_id']=str( repl['_id'])
-                repl['user']=str(repl['user'])
-                repl['created_at']=str(repl['created_at'])
-                repl['updated_at']=str(repl['updated_at'])
+                if(repl!="string"):
                 
+                    repl['_id']=str( repl['_id'])
+                    repl['user']=str(repl['user'])
+                    repl['created_at']=str(repl['created_at'])
+                    repl['updated_at']=str(repl['updated_at'])
+        
+def handleRecursiveReplies(replies:any):
+  
+     if(replies['replies'])==[]:
+        pass
+     else:
+        for rep in replies['replies']:
+            print(rep)
+            print("Type>> ",type(rep))
+            if(rep!="string"):
+                rep['_id']=str( rep['_id'])
+                rep['user']=str(rep['user'])
+                rep['created_at']=str(rep['created_at'])
+                rep['updated_at']=str(rep['updated_at'])
+                rep.setdefault('replies',[])
+                if rep['replies']==[]:
+                    pass
+                else:
+                    for repl in rep['replies']:
+                    
+                        print(repl=="string")
+
+                        if(repl!="string"):
+                           
+                            
+                            repl['_id']=str( repl['_id'])
+                        
+                            repl['user']=str(repl['user'])
+                            repl['created_at']=str(repl['created_at'])
+                            repl['updated_at']=str(repl['updated_at'])
+                            
+                            print("Reply>><<<>>",repl)
+                            print("\n")
+                            if repl['replies']==[]:
+                                pass
+                            else:
+                                handleRecursiveReplies(repl)
+@router.get('/',response_description="List of all replies")
+async def get_replies(user: str = Depends(get_current_user)):
+    replies= list(main.Replies.find())
+    
+    #print("found replies: ",replies)
+    
+    for rep in replies:
+        for r in replies:
+            if r['tweet_id']==str(rep['_id']):
+                rep['replies'].append(r)
+
+    for rep in replies:
+        rep['_id']=str( rep['_id'])
+        rep['user']=str(rep['user'])
+        rep['created_at']=str(rep['created_at'])
+        rep['updated_at']=str(rep['updated_at'])
+        rep.setdefault('replies',[])
+        if rep['replies']==[]:
+            pass
+        else:
+            handleRecursiveReplies(rep)
         print(rep)
         rep=json.dumps(rep)
         print(rep)
@@ -83,5 +133,58 @@ async def get_replies(user: str = Depends(get_current_user)):
     # print(replies)
     
     return {'status': 'success', 'replies': replies}
+
+@router.get(
+    "/{id}", response_description="Get a single reply"
+)
+async def get_reply(id: str,user: str = Depends(get_current_user)):
+    print("User>> ",user)
+    if(len(id)!=24):
+        raise HTTPException(status_code=404, detail=f" reply id must have 24 length")
+    
+    try:
+        id=ObjectId(id)
+        if (reply :=  main.Replies.find_one({"_id":  id})) is not None:
+            print("found reply:> ",reply)
+            reply['_id']=str( reply['_id'])
+            reply['user']=str(reply['user'])
+            reply['created_at']=str(reply['created_at'])
+            reply['updated_at']=str(reply['updated_at'])
+            reply.setdefault('replies',[])
+            if reply['replies']==[]:
+                pass
+            else:
+                handleRecursiveReplies(reply)
+            print(reply)
+            reply=json.dumps(reply)
+            print(reply)
+            print(type(reply))
+            return json.loads(reply)
+
+        raise HTTPException(status_code=404, detail=f"reply {id} not found")
+
+    except:
+      raise HTTPException(status_code=404, detail=f"tweet {id} not found")
+
+    
+@router.put("/{id}", response_description="Update a reply", response_model=schemas.TweetBaseSchema)
+async def update_reply(id: str, reply: schemas.UpdateTweetSchema = Body(...),user: str = Depends(get_current_user)):
+    reply = {k: v for k, v in reply.dict().items() if v is not None}
+    if(len(id)!=24):
+        raise HTTPException(status_code=404, detail=f" reply id must have 24 length")
+    
+    if len(reply) >= 1:
+        update_result =  main.Replies.update_one({"_id": ObjectId(id)}, {"$set": reply})
+
+        if update_result.modified_count == 1:
+            if (
+                updated_reply:= main.Replies.find_one({"_id": id})
+            ) is not None:
+                return reply
+
+    if (existing_reply := main.Replies.find_one({"_id": ObjectId(id)})) is not None:
+        return existing_reply
+
+    raise HTTPException(status_code=404, detail=f"reply {id} not found")
 
 

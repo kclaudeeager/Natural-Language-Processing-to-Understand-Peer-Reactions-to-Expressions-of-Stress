@@ -67,10 +67,12 @@ def get_tweets(user: str = Depends(get_current_user)):
             pass
         else:
             for repl in rep['replies']:
-                repl['_id']=str( repl['_id'])
-                repl['user']=str(repl['user'])
-                repl['created_at']=str(repl['created_at'])
-                repl['updated_at']=str(repl['updated_at'])
+                if(repl!="string"):
+                
+                    repl['_id']=str( repl['_id'])
+                    repl['user']=str(repl['user'])
+                    repl['created_at']=str(repl['created_at'])
+                    repl['updated_at']=str(repl['updated_at'])
         
                 
     for tweet in tweets:
@@ -93,7 +95,7 @@ def get_tweets(user: str = Depends(get_current_user)):
 )
 async def get_tweet(id: str,user: str = Depends(get_current_user)):
     if(len(id)!=24):
-        raise HTTPException(status_code=404, detail=f" tweet id must have 12 length")
+        raise HTTPException(status_code=404, detail=f" tweet id must have 24 length")
     
     try:
         id=ObjectId(id)
@@ -107,9 +109,11 @@ async def get_tweet(id: str,user: str = Depends(get_current_user)):
 
     
 @router.put("/{id}", response_description="Update a tweet", response_model=schemas.TweetBaseSchema)
-async def update_student(id: str, tweet: schemas.UpdateTweetSchema = Body(...),user: str = Depends(get_current_user)):
+async def update_tweet(id: str, tweet: schemas.UpdateTweetSchema = Body(...),user: str = Depends(get_current_user)):
     tweet = {k: v for k, v in tweet.dict().items() if v is not None}
-
+    if(len(id)!=24):
+        raise HTTPException(status_code=404, detail=f" tweet id must have 24 length")
+    
     if len(tweet) >= 1:
         update_result =  main.Tweet.update_one({"_id": ObjectId(id)}, {"$set": tweet})
 

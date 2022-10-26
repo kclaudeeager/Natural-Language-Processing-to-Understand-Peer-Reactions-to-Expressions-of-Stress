@@ -63,11 +63,10 @@ class attachement(BaseModel):
     name:str
     src:str
 class TweetBaseSchema(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     mentions:list
     message:str
     hashtags:list
-    attachements:List
+    attachements:Union[List,None]=None
     timeLeft:str
     isreacted:bool=False
     count:int=0
@@ -75,7 +74,7 @@ class TweetBaseSchema(BaseModel):
     retweets:int=0
     created_at: datetime = None
     updated_at: datetime = None
-    replies:List=[]
+    replies:Union[List,None]=None
     
     class Config:
         orm_mode = True
@@ -130,7 +129,7 @@ class RepliesBaseSchema(BaseModel):
     count:int=0
     displayReplies:bool=False
     retweets:int=0
-    attachements:List
+    attachements:Union[List,None]=None
     user: str = None
     replies:Union[List,None]=None
     class Config:
