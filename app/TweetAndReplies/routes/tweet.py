@@ -111,7 +111,7 @@ async def update_student(id: str, tweet: schemas.UpdateTweetSchema = Body(...),u
     tweet = {k: v for k, v in tweet.dict().items() if v is not None}
 
     if len(tweet) >= 1:
-        update_result = await main.Tweet.update_one({"_id": ObjectId(id)}, {"$set": tweet})
+        update_result =  main.Tweet.update_one({"_id": ObjectId(id)}, {"$set": tweet})
 
         if update_result.modified_count == 1:
             if (
@@ -119,7 +119,7 @@ async def update_student(id: str, tweet: schemas.UpdateTweetSchema = Body(...),u
             ) is not None:
                 return updated_tweet
 
-    if (existing_tweet := main.Tweet.find_one({"_id": id})) is not None:
+    if (existing_tweet := main.Tweet.find_one({"_id": ObjectId(id)})) is not None:
         return existing_tweet
 
     raise HTTPException(status_code=404, detail=f"tweet {id} not found")
