@@ -13,7 +13,11 @@ The project has three main objectives. First, to identify peer reactions to nega
 ## Project boundary
 As we will not have access to twitter, we only experiment with the data, and our project will not have a direct impact on the users. We plan to find ways to reframe or reply positively to a statement expressing negative stress.
 
-# We have created a backend to run it do the following
+## We have created a backend to run it do the following
+
+### go to app directory
+
 ```
-sudo uvicorn OverallBackend:app --host localhost --port 85 
+cd app
+sudo uvicorn app:app --reload
 ```
