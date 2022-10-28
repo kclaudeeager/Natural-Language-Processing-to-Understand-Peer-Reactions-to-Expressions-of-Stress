@@ -63,10 +63,10 @@ class attachement(BaseModel):
     name:str
     src:str
 class TweetBaseSchema(BaseModel):
-    mentions:list
+    mentions:list=[]
     message:str
-    hashtags:list
-    attachements:Union[List,None]=None
+    hashtags:list=[]
+    attachements:Union[List,None]=[]
     timeLeft:str
     isreacted:bool=False
     count:int=0
@@ -74,7 +74,8 @@ class TweetBaseSchema(BaseModel):
     retweets:int=0
     created_at: datetime = None
     updated_at: datetime = None
-    replies:Union[List,None]=None
+    replies:Union[List,None]=[]
+    shareNumber:int=0
     
     class Config:
         orm_mode = True
@@ -97,17 +98,17 @@ class TweetResponse(TweetBaseSchema):
 
 class UpdateTweetSchema(BaseModel):
    
-    mentions:list=None
+    mentions:list=[]
     message:str=None
-    hashtags:list=None
+    hashtags:list=[]
     timeLeft:str=None
     isreacted:bool=False
     count:int=0
     displayReplies:bool=False
     retweets:int=0
-    attachements:List
+    attachements:List=[]
     user: str = None
-    replies:Union[List,None]=None
+    shareNumber:int=0
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
@@ -121,17 +122,18 @@ class ListPostResponse(BaseModel):
     posts: List[TweetResponse]
 class RepliesBaseSchema(BaseModel):
     tweet_id:str
-    mentions:list=None
+    mentions:list=[]
     message:str=None
-    hashtags:list=None
+    hashtags:list=[]
     timeLeft:str=None
     isreacted:bool=False
     count:int=0
     displayReplies:bool=False
     retweets:int=0
-    attachements:Union[List,None]=None
+    attachements:Union[List,None]=[]
     user: str = None
-    replies:Union[List,None]=None
+    replies:Union[List,None]=[]
+    shareNumber:int=0
     class Config:
         orm_mode = True
         allow_population_by_field_name = True

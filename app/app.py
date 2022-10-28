@@ -16,10 +16,11 @@ origins = [
 ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    # allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_origins=['*']
 )
 app.include_router(user.router, tags=['Users'], prefix='/api/users')
 app.include_router(tweet.router, tags=['Tweets'], prefix='/api/tweets')
