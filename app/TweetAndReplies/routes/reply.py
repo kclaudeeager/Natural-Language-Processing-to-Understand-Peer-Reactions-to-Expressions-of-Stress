@@ -121,11 +121,11 @@ async def get_replies(user: str = Depends(get_current_user)):
         rep['created_at']=str(rep['created_at'])
         rep['updated_at']=str(rep['updated_at'])
         rep.setdefault('replies',[])
-        if rep['replies']==[]:
-            pass
-        else:
-            handleRecursiveReplies(rep)
-        print(rep)
+        # if rep['replies']==[]:
+        #     pass
+        # else:
+        #     handleRecursiveReplies(rep)
+        # print(rep)
         rep=json.dumps(rep)
         print(rep)
         print(type(rep))
@@ -138,6 +138,7 @@ async def get_replies(user: str = Depends(get_current_user)):
     "/{id}", response_description="Get a single reply"
 )
 async def get_reply(id: str,user: str = Depends(get_current_user)):
+    replies= list(main.Replies.find())
     print("User>> ",user)
     if(len(id)!=24):
         raise HTTPException(status_code=404, detail=f" reply id must have 24 length")
@@ -145,6 +146,11 @@ async def get_reply(id: str,user: str = Depends(get_current_user)):
     try:
         id=ObjectId(id)
         if (reply :=  main.Replies.find_one({"_id":  id})) is not None:
+            for rep in replies:
+                
+                if rep['tweet_id']==str(reply['_id']):
+                    reply['replies'].append(rep)
+
             print("found reply:> ",reply)
             reply['_id']=str( reply['_id'])
             reply['user']=str(reply['user'])

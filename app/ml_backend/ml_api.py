@@ -1,36 +1,19 @@
 # text preprocessing modules
-import email
 from string import punctuation
-from weakref import ReferenceType
 # text preprocessing modules
-from nltk.tokenize import word_tokenize
-import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import re  # regular expression
-import os
 from os.path import dirname, join, realpath
 import joblib
-from fastapi import FastAPI ,APIRouter
+from fastapi import APIRouter
 import time
-import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
-import uvicorn
-from fastapi import FastAPI, HTTPException
-from sentence_transformers import SentenceTransformer, util
-from transformers import Trainer, pipeline, set_seed, AutoTokenizer, AutoModelForSeq2SeqLM, DataCollatorForSeq2Seq, Seq2SeqTrainingArguments, Seq2SeqTrainer
-import pandas as pd
+from fastapi import FastAPI
 import pickle
-import gensim
 # upgrade gensim if you can't import softcossim
 #from gensim.matutils import softcossim 
-from gensim import corpora
-import gensim.downloader as api
-from gensim.utils import simple_preprocess
-from pydantic import BaseModel
-from typing import Optional
 
 tweet_list=[]
 replies_list=[]
@@ -207,7 +190,7 @@ def create_recommendation(sentence: str,corpus:list,limit:int):
 def loadReframerModel():
     # load the model from disk
 
-    filename = 'output/finalized_reframer.sav'
+    filename = 'output/t5_controlled_model.pkl'
     loaded_reframer = pickle.load(open(filename, 'rb'))
     return loaded_reframer 
 loaded_reframer=loadReframerModel()

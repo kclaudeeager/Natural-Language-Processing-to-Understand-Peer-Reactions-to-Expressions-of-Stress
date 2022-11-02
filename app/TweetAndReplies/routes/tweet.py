@@ -89,23 +89,84 @@ def get_tweets(user: str = Depends(get_current_user)):
         tweet=json.dumps(tweet)
              
     return {'status': 'success', 'tweets': tweets}
+def get_reply(id: str,user: str = Depends(get_current_user)):
+    replies= list(main.Replies.find())
+    try:
+        
+        reply=main.Replies.find_one({"_id":  id})
+        #print("reply ",reply)
+        if reply is not None:
+            for rep in replies:
+                
+                if rep['tweet_id']==str(reply['_id']):
+                    rep['_id']=str(rep['_id'])
+                    
+                    rep['user']=str(rep['user'])
+                    rep['created_at']=str(rep['created_at'])
+                    rep['updated_at']=str(rep['updated_at'])
+                    reply['replies'].append(rep)
 
+            #print("found reply:> ",reply)
+            reply['_id']=str( reply['_id'])
+            reply['user']=str(reply['user'])
+            reply['created_at']=str(reply['created_at'])
+            reply['updated_at']=str(reply['updated_at'])
+    
+            print("Replies so far",reply)
+            return reply
+
+        raise HTTPException(status_code=404, detail=f"reply {id} not found")
+
+    except:
+       raise HTTPException(status_code=404, detail=f"tweet {id} not found")
+        #print("I am lost")
 @router.get(
-    "/{id}", response_description="Get a single tweet", response_model=schemas.TweetBaseSchema
+    "/{id}", response_description="Get a single tweet"
 )
 async def get_tweet(id: str,user: str = Depends(get_current_user)):
     if(len(id)!=24):
         raise HTTPException(status_code=404, detail=f" tweet id must have 24 length")
-    
+    id=ObjectId(id)
     try:
-        id=ObjectId(id)
-        if (tweet :=  main.Tweet.find_one({"_id":  id})) is not None:
+    
+        tweet=main.Tweet.find_one({"_id":  id})
+        if tweet is not None:
+            replies= list(main.Replies.find())
+
+            for rep in replies:
+                rep['_id']=str( rep['_id'])
+                rep['user']=str(rep['user'])
+                rep['created_at']=str(rep['created_at'])
+                rep['updated_at']=str(rep['updated_at'])
+                rep.setdefault('replies',[])
+            if rep['replies']==[]:
+                pass
+            else:
+                for repl in rep['replies']:
+                    if(repl!="string"):
+                    
+                        repl['_id']=str( repl['_id'])
+                        repl['user']=str(repl['user'])
+                        repl['created_at']=str(repl['created_at'])
+                        repl['updated_at']=str(repl['updated_at'])
+        
+            tweet['_id']=str( tweet['_id'])
+            tweet['user']=str(tweet['user'])
+            tweet['created_at']=str(tweet['created_at'])
+            tweet['updated_at']=str(tweet['updated_at'])
+            tweet.setdefault('replies',[])
+            for rep in replies:
+                if rep['tweet_id']==tweet['_id']:
+                    tweet['replies'].append(rep)
+            #tweet=json.dumps(tweet)
             return tweet
+
 
         raise HTTPException(status_code=404, detail=f"tweet {id} not found")
 
     except:
-      raise HTTPException(status_code=404, detail=f"tweet {id} not found")
+    
+     return get_reply(id,user)
 
     
 @router.put("/{id}", response_description="Update a tweet", response_model=schemas.TweetBaseSchema)
