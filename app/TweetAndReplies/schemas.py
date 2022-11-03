@@ -145,4 +145,3 @@ class RepliesBaseSchema(BaseModel):
 class CreateReplySchema(RepliesBaseSchema):
     user: ObjectId = None
     tweet:ObjectId =None
-
