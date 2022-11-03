@@ -62,13 +62,15 @@ class attachement(BaseModel):
     caption:str
     name:str
     src:str
+
+    
 class TweetBaseSchema(BaseModel):
     mentions:list=[]
     message:str
     hashtags:list=[]
     attachements:Union[List,None]=[]
     timeLeft:str
-    isreacted:bool=False
+    likes:list=[]
     count:int=0
     displayReplies:bool=False
     retweets:int=0
@@ -107,6 +109,7 @@ class UpdateTweetSchema(BaseModel):
     displayReplies:bool=False
     retweets:int=0
     attachements:List=[]
+    likes:list=[]
     user: str = None
     shareNumber:int=0
     class Config:
@@ -127,9 +130,9 @@ class RepliesBaseSchema(BaseModel):
     hashtags:list=[]
     timeLeft:str=None
     isreacted:bool=False
+    likes:list=[]
     count:int=0
     displayReplies:bool=False
-    retweets:int=0
     attachements:Union[List,None]=[]
     user: str = None
     replies:Union[List,None]=[]
@@ -142,3 +145,4 @@ class RepliesBaseSchema(BaseModel):
 class CreateReplySchema(RepliesBaseSchema):
     user: ObjectId = None
     tweet:ObjectId =None
+

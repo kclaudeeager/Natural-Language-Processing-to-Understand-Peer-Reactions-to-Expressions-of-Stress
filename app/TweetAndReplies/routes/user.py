@@ -67,5 +67,3 @@ def findUser(id: str,userReturned: str = Depends(get_current_user)):
     except:
       raise HTTPException(status_code=404, detail=f"user {id} not found")
    
-        
-    
