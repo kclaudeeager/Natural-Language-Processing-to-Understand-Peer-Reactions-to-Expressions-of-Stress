@@ -21,3 +21,4 @@ As we will not have access to twitter, we only experiment with the data, and our
 cd app
 sudo uvicorn app:app --reload
 ```
+# if you wish you can even specify the running port
