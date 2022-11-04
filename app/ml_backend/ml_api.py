@@ -5,6 +5,7 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import re  # regular expression
 from os.path import dirname, join, realpath
+import os
 import joblib
 from fastapi import APIRouter
 import time
@@ -12,9 +13,35 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 from fastapi import FastAPI
 import pickle
+import pandas as pd
+from IPython.display import display
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+import gensim
 # upgrade gensim if you can't import softcossim
-#from gensim.matutils import softcossim 
+from gensim.models import TfidfModel
+from gensim.matutils import softcossim 
+from gensim import corpora
+import gensim.downloader as api
+from gensim.utils import simple_preprocess
+import numpy as np
+print(gensim.__version__)
 
+from gensim.matutils import softcossim 
+
+# # Download the FastText model
+# fasttext_model300 = api.load('fasttext-wiki-news-subwords-300')
+
+# with open(join(dirname(realpath(__file__)), "models/fasttext_model300.pkl"), 'wb') as f:
+#     pickle.dump(fasttext_model300, f)
+
+# if os.path.getsize(join(dirname(realpath(__file__)), "models/fasttext_model300.pkl")) > 0:      
+#     with open(join(dirname(realpath(__file__)), "models/fasttext_model300.pkl"), "rb") as f:
+#         unpickler = pickle.Unpickler(f)
+#         # if file is not empty scores will be equal
+#         # to the value unpickled
+#         fasttext_model300 = unpickler.load()
+# print("File has successfully saved")
 tweet_list=[]
 replies_list=[]
 router = APIRouter()
@@ -26,6 +53,7 @@ def get_root():
 #fasttext_model300 = api.load('fasttext-wiki-news-subwords-300')
 
 # load the sentiment model
+
 with open(
     join(dirname(realpath(__file__)), "models/trained_model1.pkl"), "rb"
 ) as f:
@@ -146,13 +174,26 @@ def cosineSimillarity(corpus):
     start = time.time()
     # Initialize an instance of tf-idf Vectorizer
     tfidf_vectorizer = TfidfVectorizer(stop_words='english')
-
+    dictionary = corpora.Dictionary([simple_preprocess(doc) for doc in corpus])
+    # Prepare the similarity matrix
+    # similarity_matrix = fasttext_model300.similarity_matrix(dictionary, tfidf=None, threshold=0.0, exponent=2.0, nonzero_limit=100)
+    
+    # len_array = np.arange(len(corpus))
+    # xx, yy = np.meshgrid(len_array, len_array)
+    # cossim_mat = pd.DataFrame([[round(softcossim(corpus[i],corpus[j], similarity_matrix) ,2) for i, j in zip(x,y)] for y, x in zip(xx, yy)])
+   
     # Generate the tf-idf vectors for the corpus
     tfidf_matrix = tfidf_vectorizer.fit_transform(corpus)
-
+    #tfidf_matrix=TfidfModel(corpus)
+    doc_term_matrix = tfidf_matrix.todense()
+    df = pd.DataFrame(doc_term_matrix, 
+                  columns=tfidf_vectorizer.get_feature_names(), 
+                  index=[corpus])
+    display(df)
     # compute and print the cosine similarity matrix
     #cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
-    cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
+    #cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
+    cosine_sim = linear_kernel(df, df)
     print(cosine_sim)
     # Print time taken
     print("Time taken: %s seconds" % (time.time() - start))
