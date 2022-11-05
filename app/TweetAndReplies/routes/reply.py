@@ -28,6 +28,12 @@ async def create_reply(reply: schemas.RepliesBaseSchema, userReturned: str = Dep
     reply['user']= ObjectId(user_id)
     reply['created_at'] = datetime.utcnow()
     reply['updated_at'] = reply['created_at']
+    reply['classification']={
+        "prediction":reply['classification'].prediction,
+        "Probability":reply['classification'].Probability
+    }
+    #classification(predict='Negative', Probability=0.27
+    
     try:
         result = main.Replies.insert_one(reply)
 

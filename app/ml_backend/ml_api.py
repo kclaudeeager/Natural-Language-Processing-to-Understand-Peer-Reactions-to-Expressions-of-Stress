@@ -217,6 +217,7 @@ def create_recommendation(sentence: str,corpus:list,limit:int):
     print("Sentence: ",sentence)
     recommendation=get_recommendations(sentence,cosine_sim, corpus,limit)
     print(recommendation)
+    
     recommendationList=[]
     print(type(recommendation))
     # for key,value in recommendation:

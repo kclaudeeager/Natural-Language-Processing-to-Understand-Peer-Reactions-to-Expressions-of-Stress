@@ -78,7 +78,7 @@ class TweetBaseSchema(BaseModel):
     updated_at: datetime = None
     replies:Union[List,None]=[]
     shareNumber:int=0
-    
+  
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
@@ -123,6 +123,12 @@ class ListPostResponse(BaseModel):
     status: str
     results: int
     posts: List[TweetResponse]
+
+class classification(BaseModel):
+    prediction:str=None
+    Probability:float=0.0
+   
+        
 class RepliesBaseSchema(BaseModel):
     tweet_id:str
     mentions:list=[]
@@ -134,6 +140,7 @@ class RepliesBaseSchema(BaseModel):
     count:int=0
     displayReplies:bool=False
     attachements:Union[List,None]=[]
+    classification:Union[classification,None]
     user: str = None
     replies:Union[List,None]=[]
     shareNumber:int=0
