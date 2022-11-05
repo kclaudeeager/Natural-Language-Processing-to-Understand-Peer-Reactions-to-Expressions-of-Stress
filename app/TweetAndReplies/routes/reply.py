@@ -110,6 +110,23 @@ def handleRecursiveReplies(replies:any):
                                 pass
                             else:
                                 handleRecursiveReplies(repl)
+
+
+#Rearrange the tweets and replies again
+def Rearrange_again(replies):
+
+    postive_replies=[rep for rep in replies if rep.get('classification').get('prediction')=='Positive']
+    negative_replies=[rep for rep in replies if rep.get('classification').get('prediction')=='Negative']
+    neutral_replies=[rep for rep in replies if rep.get('classification').get('prediction')=='Neutral']
+
+    postive_replies=sorted(postive_replies,key=lambda x:x.get('classification').get('Probability'),reverse=True)
+  
+    negative_replies=sorted(negative_replies,key=lambda x:x.get('classification').get('Probability'),reverse=False)
+    neutral_replies=sorted(neutral_replies,key=lambda x:x.get('classification').get('Probability'),reverse=True)
+    
+    replies=postive_replies+neutral_replies+negative_replies
+  
+    return replies
 @router.get('/',response_description="List of all replies")
 async def get_replies(user: str = Depends(get_current_user)):
     replies= list(main.Replies.find())
@@ -132,12 +149,13 @@ async def get_replies(user: str = Depends(get_current_user)):
         # else:
         #     handleRecursiveReplies(rep)
         # print(rep)
-        rep=json.dumps(rep)
+        #rep=json.dumps(rep)
         print(rep)
         print(type(rep))
     # replies = await main.Replies.find().to_list(1000)
     # print(replies)
-    
+    replies=Rearrange_again(replies)
+    print("Replies:: ",replies)
     return {'status': 'success', 'replies': replies}
 
 @router.get(

@@ -1,4 +1,5 @@
 from typing import Optional
+from TweetAndReplies.routes.reply import Rearrange_again
 from fastapi import FastAPI, HTTPException, Depends, Request,status,Body,APIRouter
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -83,6 +84,7 @@ def get_tweets(user: str = Depends(get_current_user)):
         tweet['created_at']=str(tweet['created_at'])
         tweet['updated_at']=str(tweet['updated_at'])
         tweet.setdefault('replies',[])
+        replies=Rearrange_again(replies)
         for rep in replies:
             if rep['tweet_id']==tweet['_id']:
                 tweet['replies'].append(rep)
@@ -155,6 +157,7 @@ async def get_tweet(id: str,user: str = Depends(get_current_user)):
             tweet['created_at']=str(tweet['created_at'])
             tweet['updated_at']=str(tweet['updated_at'])
             tweet.setdefault('replies',[])
+            replies=Rearrange_again(replies)
             for rep in replies:
                 if rep['tweet_id']==tweet['_id']:
                     tweet['replies'].append(rep)
