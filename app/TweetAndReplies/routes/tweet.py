@@ -48,9 +48,7 @@ async def create_tweet(tweet: schemas.TweetBaseSchema, userReturned: str = Depen
     except:
       return {"Error":"Error in tweeting"}
 
-@router.get('/')
-def get_tweets(user: str = Depends(get_current_user)):
-   
+def getTweets():
     tweets = list(main.Tweet.find())
     replies= list(main.Replies.find())
     for rep in replies:
@@ -89,6 +87,11 @@ def get_tweets(user: str = Depends(get_current_user)):
             if rep['tweet_id']==tweet['_id']:
                 tweet['replies'].append(rep)
         tweet=json.dumps(tweet)
+    return tweets
+@router.get('/')
+def get_tweets(user: str = Depends(get_current_user)):
+   
+    tweets = getTweets()
              
     return {'status': 'success', 'tweets': tweets}
 def get_reply(id: str,user: str = Depends(get_current_user)):

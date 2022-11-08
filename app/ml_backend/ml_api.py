@@ -1,5 +1,10 @@
 # text preprocessing modules
+from http.client import HTTPException
+import json
 from string import punctuation
+from TweetAndReplies.schemas import TweetBaseSchema
+from TweetAndReplies.oauth import get_current_user
+from TweetAndReplies.routes.tweet import getTweets
 # text preprocessing modules
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
@@ -7,11 +12,10 @@ import re  # regular expression
 from os.path import dirname, join, realpath
 import os
 import joblib
-from fastapi import APIRouter
 import time
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
-from fastapi import FastAPI
+from fastapi import  HTTPException, Depends,APIRouter
 import pickle
 import pandas as pd
 from IPython.display import display
@@ -26,8 +30,11 @@ import gensim.downloader as api
 from gensim.utils import simple_preprocess
 import numpy as np
 print(gensim.__version__)
-
+from typing import List
 from gensim.matutils import softcossim 
+from bson import ObjectId
+import TweetAndReplies.main as main
+from TweetAndReplies.routes.reply import Rearrange_again
 
 # # Download the FastText model
 # fasttext_model300 = api.load('fasttext-wiki-news-subwords-300')
@@ -199,8 +206,43 @@ def cosineSimillarity(corpus):
     print("Time taken: %s seconds" % (time.time() - start))
     return cosine_sim
 
-@router.post("/create_recommendation")
-def create_recommendation(sentence: str,corpus:list,limit:int):
+#Returning the list of tweets with thier replies after similarity computation
+def get_grouped_tweet_with_replies_after_similarity_calculation(tweetDict,similarTweets_dict):
+#     returnedGroupList=[]
+    similarTweets_dict_copy=similarTweets_dict
+    for tweet in tweetDict:
+        for key,value in similarTweets_dict.items():
+#             print("value: ",value)
+#             print("tweet text: ",tweet.get('text'))
+            if tweet['message']==value:
+                #print("found...: ",tweet)
+                value=tweet
+                similarTweets_dict[key]=value
+#                 print("Value now: >>>",value)
+#                 print("similarTweets_dict now: <<<<>>>>>>",similarTweets_dict)
+    return similarTweets_dict_copy,similarTweets_dict
+#adding the replies of the similar tweets  to the tweet in that group
+def addRepliesToTweet(similar_group_tweets):
+    tweetGroup=similar_group_tweets['tweet_group']
+    orginal_tweet=similar_group_tweets['tweet']
+    replies=orginal_tweet['replies']
+    for replyObj in tweetGroup:
+        newdict=tweetGroup[replyObj]
+        #print("New dict replies:::",[reply for reply  in newdict['replies']])
+        #Retturning only the postive replies for each tweet
+        bestReplies=[reply for reply  in newdict['replies'] if reply["classification"].get('prediction')=='Positive']
+        print("Best replies::",bestReplies)
+        for reply in bestReplies:
+            if reply not in replies:
+             
+                replies.append(reply)
+    orginal_tweet['replies']=replies
+    similar_group_tweets['tweet']=orginal_tweet
+
+   
+
+@router.get("/create_recommendation",response_description=" A simple function that receive a sentence content and predict the other related texts :param sentense::return: sentense, list of other simillar sentences,limit of similaraties")
+def create_recommendation(id: str,limit:int):
     """
     A simple function that receive a sentence content and predict the other related texts
     :param sentense:
@@ -210,24 +252,65 @@ def create_recommendation(sentence: str,corpus:list,limit:int):
     #cleaned_sentence = text_cleaning(sentence)
     # for sent in corpus:
     #     text_cleaning(sent)
+    if(len(id)!=24):
+            raise HTTPException(status_code=404, detail=f" tweet id must have 24 length")
+    id=ObjectId(id)
+    
+    tweet=main.Tweet.find_one({"_id":  id})
+    if tweet is not None:
+        replies= list(main.Replies.find())
+
+        for rep in replies:
+            rep['_id']=str( rep['_id'])
+            rep['user']=str(rep['user'])
+            rep['created_at']=str(rep['created_at'])
+            rep['updated_at']=str(rep['updated_at'])
+            rep.setdefault('replies',[])
+        if rep['replies']==[]:
+            pass
+        else:
+            for repl in rep['replies']:
+                if(repl!="string"):
+                
+                    repl['_id']=str( repl['_id'])
+                    repl['user']=str(repl['user'])
+                    repl['created_at']=str(repl['created_at'])
+                    repl['updated_at']=str(repl['updated_at'])
+    
+        tweet['_id']=str( tweet['_id'])
+        tweet['user']=str(tweet['user'])
+        tweet['created_at']=str(tweet['created_at'])
+        tweet['updated_at']=str(tweet['updated_at'])
+        tweet.setdefault('replies',[])
+        replies=Rearrange_again(replies)
+        for rep in replies:
+            if rep['tweet_id']==tweet['_id']:
+                tweet['replies'].append(rep)
+    tweetList=getTweets() 
+    #print("Tweet>>",tweet)  
+    sentence=tweet['message']
+   # print("Sentence::",sentence)
+    corpus=[eachTweet['message'] for eachTweet in tweetList if eachTweet['message']!=sentence ]
     if sentence not in corpus:
         corpus.append(sentence) 
     cosine_sim=cosineSimillarity(corpus)
     print(cosine_sim)
-    print("Sentence: ",sentence)
+   # print("Sentence: ",sentence)
     recommendation=get_recommendations(sentence,cosine_sim, corpus,limit)
-    print(recommendation)
-    
-    recommendationList=[]
-    print(type(recommendation))
-    # for key,value in recommendation:
-    #     print(value)
-    #     recommendationList.append(value)
-    recommendationList=list(recommendation.values())
-    print(recommendationList)
+    #print(recommendation)
+    similarTweets_dict=recommendation
+    similarTweets_dict_copy,similarTweets_dict=get_grouped_tweet_with_replies_after_similarity_calculation(tweetList,similarTweets_dict)
+    print(similarTweets_dict_copy,'\n___________________________________\n')
+    #print("reformed: ",similarTweets_dict)
+    tweet_with_group_dict={"tweet":tweet,"tweet_group":similarTweets_dict}
+    print("tweet_with_group_dict: \n",tweet_with_group_dict)
+    print("\n___________________________________________\n")
+    addRepliesToTweet(tweet_with_group_dict)
+    returnedTweet=tweet_with_group_dict.get('tweet')
+    print(returnedTweet)
     print("*******************************************************************************************\n\n")
      
-    return recommendationList
+    return returnedTweet
 
 def loadReframerModel():
     # load the model from disk

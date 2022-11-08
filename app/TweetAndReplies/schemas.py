@@ -152,3 +152,7 @@ class RepliesBaseSchema(BaseModel):
 class CreateReplySchema(RepliesBaseSchema):
     user: ObjectId = None
     tweet:ObjectId =None
+
+# class recommendationSchema(BaseModel):
+#     originalTweet:Union[TweetBaseSchema,None]
+#     listOfOtherTweets:Union[List[TweetBaseSchema],None]
