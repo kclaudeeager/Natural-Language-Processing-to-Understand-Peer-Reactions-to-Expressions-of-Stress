@@ -25,7 +25,7 @@ def create_user(request:main.UserModel):
     
     user_object['created_at']=(datetime.utcnow())
     user_object['updated_at']=user_object['created_at']
-    user_id = main.User.insert(user_object)
+    user_id = main.User.insert_one(user_object)
     return {str(user_object):"created"}
 	
 

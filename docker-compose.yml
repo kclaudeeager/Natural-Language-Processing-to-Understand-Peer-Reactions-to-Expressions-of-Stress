@@ -1,0 +1,9 @@
+version: '3'
+services:
+    core_api:
+        build: .
+        container_name: "Positive-Reframing"
+        ports:
+            - "8080:15400"
+        volumes:
+            - ./app/:/app

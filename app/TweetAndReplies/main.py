@@ -20,8 +20,9 @@ router = APIRouter()
 
 from pymongo import MongoClient
 mongodb_uri = 'mongodb://Kclaude:Kwizeraeager@localhost:27017/Reframing?authSource=admin'
+remote_mongo_db_uri='mongodb+srv://kclaude:Kwizeraeager@positive-reframing-twee.bjvzmtp.mongodb.net/Reframing'
 port = 8000
-client = MongoClient(mongodb_uri, port)
+client = MongoClient(remote_mongo_db_uri, port)
 db = client["Positive_reframing"]
 User=db['users']
 Tweet=db['tweets']
