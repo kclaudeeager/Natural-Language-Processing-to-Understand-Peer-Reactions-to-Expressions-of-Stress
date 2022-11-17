@@ -3,4 +3,4 @@ __pycache__
 .envrc
 .env
 .DS_Store
-app/output
+#  app/output
