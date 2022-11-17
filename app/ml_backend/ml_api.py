@@ -315,7 +315,7 @@ def create_recommendation(id: str,limit:int):
 def loadReframerModel():
     # load the model from disk
 
-    filename = 'output/t5_controlled_model.pkl'
+    filename = 'output1/t5_controlled_model.pkl'
     loaded_reframer = pickle.load(open(filename, 'rb'))
     return loaded_reframer 
 loaded_reframer=loadReframerModel()
