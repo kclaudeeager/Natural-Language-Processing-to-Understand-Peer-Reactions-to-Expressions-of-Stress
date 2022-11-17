@@ -122,4 +122,5 @@ typing
 joblib
 gensim
 datetime
-
+pydantic
+pymongo
